@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.devlight.test.cocktail.bean.model.Cocktail;
 import com.devlight.test.cocktail.bean.model.Drinks;
 import com.devlight.test.cocktail.network.NetworkService;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -27,9 +28,14 @@ public class MainActivity extends AppCompatActivity {
 
         mTextView = findViewById(R.id.textid);
 
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(v -> {
+            //TODO TEST
+            testREST();
+        });
 
-        //TODO TEST
-        testREST();
+
+
     }
 
     private void testREST(){
@@ -67,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
                         t.printStackTrace();
                     }
                 });
-
     }
+
+
 }
