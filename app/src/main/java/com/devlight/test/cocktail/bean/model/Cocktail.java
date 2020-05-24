@@ -5,8 +5,15 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class Cocktail {
 
+    @NonNull
+    @PrimaryKey(autoGenerate = false)
     @SerializedName("idDrink")
     @Expose
     private String mIdDrink;

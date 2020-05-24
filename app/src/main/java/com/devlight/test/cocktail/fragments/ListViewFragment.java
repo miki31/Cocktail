@@ -14,9 +14,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.devlight.test.cocktail.App;
 import com.devlight.test.cocktail.R;
 import com.devlight.test.cocktail.bean.model.Cocktail;
+import com.devlight.test.cocktail.bean.model.CocktailModel;
 import com.devlight.test.cocktail.bean.model.Drinks;
+import com.devlight.test.cocktail.dao.CocktailDAO;
+import com.devlight.test.cocktail.db.AppDatabase;
 import com.devlight.test.cocktail.network.NetworkService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -38,6 +42,9 @@ import retrofit2.Response;
 public class ListViewFragment extends Fragment {
     private static final String TAG = "tag_ list cocktails Fragment";
 
+    private CocktailModel model;
+
+    private CocktailModel mCocktailModel;
     private Drinks mDrinks;
     TextView mTextView;
     ImageView imageView;
@@ -59,6 +66,11 @@ public class ListViewFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        CocktailDAO dao = App.getInstance().getDatabase().mCocktailDAO();
+        model = new CocktailModel(dao);
+
+        initDB();
+
         View v = inflater.inflate(R.layout.fragment_list_view, container, false);
 
         mRecyclerView = v.findViewById(R.id.list_recycler_view);
@@ -71,8 +83,19 @@ public class ListViewFragment extends Fragment {
 
         fab = v.findViewById(R.id.fab);
 
-
         return v;
+    }
+
+    private void initDB() {
+        new Thread(() -> {
+
+            App.getInstance().initDB();
+
+            mDrinks = new Drinks();
+            mDrinks.setCocktails(model.getAll());
+
+//            createViewPager();
+        }).start();
     }
 
     @SuppressLint("LongLogTag")
@@ -86,7 +109,7 @@ public class ListViewFragment extends Fragment {
 
         fab.setOnClickListener(view -> {
             //TODO TEST
-            testREST("margarita");
+//            testREST("margarita");
             searchItem.expandActionView();
         });
 
@@ -216,6 +239,10 @@ public class ListViewFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
+            new Thread(() -> {
+                model.insert(mCocktail);
+            }).start();
+
             FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
