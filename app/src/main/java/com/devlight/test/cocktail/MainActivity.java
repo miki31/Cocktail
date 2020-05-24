@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+//        getSupportActionBar().setTitle("kjh");
 
         if (fragment == null) {
             fragment = new ListViewFragment();
