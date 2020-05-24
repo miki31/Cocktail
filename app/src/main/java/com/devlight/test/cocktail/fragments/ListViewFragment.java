@@ -16,12 +16,14 @@ import com.devlight.test.cocktail.R;
 import com.devlight.test.cocktail.bean.model.Cocktail;
 import com.devlight.test.cocktail.bean.model.Drinks;
 import com.devlight.test.cocktail.network.NetworkService;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,6 +34,7 @@ public class ListViewFragment extends Fragment {
 
     Drinks mDrinks;
     TextView mTextView;
+    FloatingActionButton fab;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,7 +42,7 @@ public class ListViewFragment extends Fragment {
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
-        testREST();
+//        testREST();
     }
 
     @Nullable
@@ -50,6 +53,9 @@ public class ListViewFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_list_view, container, false);
 
         mTextView = (TextView) v.findViewById(R.id.textid);
+
+        fab = v.findViewById(R.id.fab);
+
 
         return v;
     }
@@ -63,12 +69,19 @@ public class ListViewFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.item_main_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
 
+        fab.setOnClickListener(view -> {
+            //TODO TEST
+            testREST("margarita");
+            searchItem.expandActionView();
+        });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @SuppressLint("LongLogTag")
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Log.d(TAG, "Query Text Submit: " + query);
                 mTextView.setText("onQueryTextSubmit(): "+query);
+                testREST(query);
                 return false;
             }
 
@@ -87,11 +100,11 @@ public class ListViewFragment extends Fragment {
         });
     }
 
-    private void testREST(){
+    private void testREST(String strQuery){
 
         NetworkService.getInstance()
                 .getJSONApi()
-                .getCocktails("margarita")
+                .getCocktails(strQuery)
                 .enqueue(new Callback<Drinks>() {
                     @Override
                     public void onResponse(@NonNull Call<Drinks> call, @NonNull Response<Drinks> response) {
