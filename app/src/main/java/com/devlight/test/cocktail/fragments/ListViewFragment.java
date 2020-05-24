@@ -10,8 +10,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.devlight.test.cocktail.R;
 import com.devlight.test.cocktail.bean.model.Cocktail;
 import com.devlight.test.cocktail.bean.model.Drinks;
@@ -34,6 +36,7 @@ public class ListViewFragment extends Fragment {
 
     Drinks mDrinks;
     TextView mTextView;
+    ImageView imageView;
     FloatingActionButton fab;
 
     @Override
@@ -53,6 +56,7 @@ public class ListViewFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_list_view, container, false);
 
         mTextView = (TextView) v.findViewById(R.id.textid);
+        imageView = (ImageView) v.findViewById(R.id.image_view);
 
         fab = v.findViewById(R.id.fab);
 
@@ -108,10 +112,26 @@ public class ListViewFragment extends Fragment {
                 .enqueue(new Callback<Drinks>() {
                     @Override
                     public void onResponse(@NonNull Call<Drinks> call, @NonNull Response<Drinks> response) {
+                        if (!response.isSuccessful())
+                            return;
                         mDrinks = response.body();
+                        if (mDrinks == null)
+                            return;
+                        if (mDrinks.getCocktails() == null)
+                            return;
+                        if (mDrinks.getCocktails().size() == 0)
+                            return;
                         List<Cocktail> cocktails = mDrinks.getCocktails();
 
+
+
                         final String[] listNames = {""};
+
+                        listNames[0] = listNames[0] + cocktails.get(0).getStrDrinkThumb() + "\n";
+
+                        Glide.with(getActivity())
+                                .load(cocktails.get(0).getStrDrinkThumb())
+                                .into(imageView);
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             cocktails.forEach(
