@@ -20,7 +20,6 @@ import com.devlight.test.cocktail.bean.model.Cocktail;
 import com.devlight.test.cocktail.bean.model.CocktailModel;
 import com.devlight.test.cocktail.bean.model.Drinks;
 import com.devlight.test.cocktail.dao.CocktailDAO;
-import com.devlight.test.cocktail.db.AppDatabase;
 import com.devlight.test.cocktail.network.NetworkService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -29,7 +28,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -44,10 +42,7 @@ public class ListViewFragment extends Fragment {
 
     private CocktailModel model;
 
-    private CocktailModel mCocktailModel;
     private Drinks mDrinks;
-    TextView mTextView;
-    ImageView imageView;
     FloatingActionButton fab;
 
     private RecyclerView mRecyclerView;
@@ -58,7 +53,6 @@ public class ListViewFragment extends Fragment {
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
-//        testREST();
     }
 
     @Nullable
@@ -78,9 +72,6 @@ public class ListViewFragment extends Fragment {
 
         setupAdapter();
 
-//        mTextView = (TextView) v.findViewById(R.id.textid);
-//        imageView = (ImageView) v.findViewById(R.id.image_view);
-
         fab = v.findViewById(R.id.fab);
 
         return v;
@@ -93,8 +84,6 @@ public class ListViewFragment extends Fragment {
 
             mDrinks = new Drinks();
             mDrinks.setCocktails(model.getAll());
-
-//            createViewPager();
         }).start();
     }
 
@@ -108,8 +97,6 @@ public class ListViewFragment extends Fragment {
         final SearchView searchView = (SearchView) searchItem.getActionView();
 
         fab.setOnClickListener(view -> {
-            //TODO TEST
-//            testREST("margarita");
             searchItem.expandActionView();
         });
 
@@ -118,9 +105,7 @@ public class ListViewFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Log.d(TAG, "Query Text Submit: " + query);
-//                mTextView.setText("onQueryTextSubmit(): "+query);
-                testREST(query);
-
+                fetchQueryREST(query);
                 return false;
             }
 
@@ -128,19 +113,16 @@ public class ListViewFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.d(TAG, "Query Text change: " + newText);
-//                mTextView.setText("onQueryTextChange(): " + newText);
                 return false;
             }
         });
 
         searchView.setOnSearchClickListener(v -> {
             Log.d(TAG, "setOnSearchClickListener()");
-//            searchView.setQuery(query, false);
         });
     }
 
-    private void testREST(String strQuery){
-
+    private void fetchQueryREST(String strQuery){
         NetworkService.getInstance()
                 .getJSONApi()
                 .getCocktails(strQuery)
@@ -160,44 +142,15 @@ public class ListViewFragment extends Fragment {
                         if (mDrinks.getCocktails().size() == 0)
                             return;
                         List<Cocktail> cocktails = mDrinks.getCocktails();
-
-
-
-                        final String[] listNames = {""};
-
-                        listNames[0] = listNames[0] + cocktails.get(0).getStrDrinkThumb() + "\n";
-
-//                        Glide.with(getActivity())
-//                                .load(cocktails.get(0).getStrDrinkThumb())
-//                                .into(imageView);
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            cocktails.forEach(
-                                    cocktail->{
-                                        listNames[0] = listNames[0] + cocktail.getStrDrink() + "\n";
-                                    }
-                            );
-                        } else {
-                            for (Cocktail cocktail :
-                                    cocktails) {
-                                listNames[0] = listNames[0] + cocktail.getStrDrink() + "\n";
-                            }
-                        }
-
-//                        mTextView.setText(listNames[0]);
                     }
 
                     @Override
                     public void onFailure(Call<Drinks> call, Throwable t) {
-//                        mTextView.append("Error occurred while getting request!");
                         t.printStackTrace();
                     }
                 });
     }
 
-//    private void updateItems() {
-//        mDrinks
-//    }
 
     private void setupAdapter() {
         if (isAdded()) {

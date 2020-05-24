@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-//        getSupportActionBar().setTitle("kjh");
 
         if (fragment == null) {
             fragment = new ListViewFragment();
@@ -39,17 +38,6 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
-
-//        mTextView = findViewById(R.id.textid);
-
-//        FloatingActionButton fab = findViewById(R.id.fab);
-//        fab.setOnClickListener(v -> {
-//            //TODO TEST
-//            testREST();
-//        });
-
-
-
     }
 
 
