@@ -27,6 +27,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,10 +36,12 @@ import retrofit2.Response;
 public class ListViewFragment extends Fragment {
     private static final String TAG = "tag_ list cocktails Fragment";
 
-    Drinks mDrinks;
+    private Drinks mDrinks;
     TextView mTextView;
     ImageView imageView;
     FloatingActionButton fab;
+
+    private RecyclerView mRecyclerView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,8 +59,13 @@ public class ListViewFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_list_view, container, false);
 
-        mTextView = (TextView) v.findViewById(R.id.textid);
-        imageView = (ImageView) v.findViewById(R.id.image_view);
+        mRecyclerView = v.findViewById(R.id.list_recycler_view);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+
+        setupAdapter();
+
+//        mTextView = (TextView) v.findViewById(R.id.textid);
+//        imageView = (ImageView) v.findViewById(R.id.image_view);
 
         fab = v.findViewById(R.id.fab);
 
@@ -84,8 +93,9 @@ public class ListViewFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Log.d(TAG, "Query Text Submit: " + query);
-                mTextView.setText("onQueryTextSubmit(): "+query);
+//                mTextView.setText("onQueryTextSubmit(): "+query);
                 testREST(query);
+
                 return false;
             }
 
@@ -93,7 +103,7 @@ public class ListViewFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.d(TAG, "Query Text change: " + newText);
-                mTextView.setText("onQueryTextChange(): " + newText);
+//                mTextView.setText("onQueryTextChange(): " + newText);
                 return false;
             }
         });
@@ -115,6 +125,9 @@ public class ListViewFragment extends Fragment {
                         if (!response.isSuccessful())
                             return;
                         mDrinks = response.body();
+
+                        setupAdapter();
+
                         if (mDrinks == null)
                             return;
                         if (mDrinks.getCocktails() == null)
@@ -129,9 +142,9 @@ public class ListViewFragment extends Fragment {
 
                         listNames[0] = listNames[0] + cocktails.get(0).getStrDrinkThumb() + "\n";
 
-                        Glide.with(getActivity())
-                                .load(cocktails.get(0).getStrDrinkThumb())
-                                .into(imageView);
+//                        Glide.with(getActivity())
+//                                .load(cocktails.get(0).getStrDrinkThumb())
+//                                .into(imageView);
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             cocktails.forEach(
@@ -146,14 +159,101 @@ public class ListViewFragment extends Fragment {
                             }
                         }
 
-                        mTextView.setText(listNames[0]);
+//                        mTextView.setText(listNames[0]);
                     }
 
                     @Override
                     public void onFailure(Call<Drinks> call, Throwable t) {
-                        mTextView.append("Error occurred while getting request!");
+//                        mTextView.append("Error occurred while getting request!");
                         t.printStackTrace();
                     }
                 });
+    }
+
+//    private void updateItems() {
+//        mDrinks
+//    }
+
+    private void setupAdapter() {
+        if (isAdded()) {
+            mRecyclerView.setAdapter(new ImagePhotoAdapter(mDrinks));
+        }
+    }
+
+
+    private class ImagePhotoHolder extends RecyclerView.ViewHolder {
+        private Cocktail mCocktail;
+
+        private ImageView mImgItemCocktail;
+        private TextView mTvNameItemCocktail;
+
+        public ImagePhotoHolder(@NonNull View itemView) {
+            super(itemView);
+        }
+
+        public ImagePhotoHolder(LayoutInflater inflater, ViewGroup parent){
+            super(inflater.inflate(R.layout.list_item_cocktail,
+                    parent, false));
+
+            mImgItemCocktail = (ImageView) itemView.findViewById(R.id.img_item_cocktail);
+            mTvNameItemCocktail = (TextView) itemView.findViewById(R.id.tv_name_item_cocktail);
+        }
+
+        public void bind( Cocktail cocktail){
+            mCocktail = cocktail;
+
+            Glide.with(getActivity())
+                    .load(cocktail.getStrDrinkThumb())
+                    .into(mImgItemCocktail);
+
+            mTvNameItemCocktail.setText(cocktail.getStrDrink());
+        }
+    }
+
+    private class ImagePhotoAdapter extends RecyclerView.Adapter<ImagePhotoHolder> {
+        private Drinks mDrinks;
+
+        public ImagePhotoAdapter(Drinks drinks) {
+            mDrinks = drinks;
+        }
+
+        @NonNull
+        @Override
+        public ImagePhotoHolder onCreateViewHolder(
+                @NonNull ViewGroup parent, int viewType) {
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+
+            return new ImagePhotoHolder(inflater, parent);
+        }
+
+        @Override
+        public void onBindViewHolder(
+                @NonNull ImagePhotoHolder holder, int position) {
+            if (mDrinks == null)
+                return;
+            if (mDrinks.getCocktails() == null)
+                return;
+            if (mDrinks.getCocktails().size() == 0)
+                return;
+            Cocktail cocktail = mDrinks.getCocktails().get(position);
+            holder.bind(cocktail);
+        }
+
+        @Override
+        public int getItemCount() {
+            if (mDrinks == null)
+                return 0;
+            if (mDrinks.getCocktails() == null)
+                return 0;
+            return mDrinks.getCocktails().size();
+        }
+
+        public Drinks getDrinks() {
+            return mDrinks;
+        }
+
+        public void setDrinks(Drinks drinks) {
+            mDrinks = drinks;
+        }
     }
 }
