@@ -1,8 +1,13 @@
 package com.devlight.test.cocktail.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -16,12 +21,14 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ListViewFragment extends Fragment {
+    private static final String TAG = "tag_ list cocktails Fragment";
 
     Drinks mDrinks;
     TextView mTextView;
@@ -30,6 +37,8 @@ public class ListViewFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+        setRetainInstance(true);
         testREST();
     }
 
@@ -43,6 +52,39 @@ public class ListViewFragment extends Fragment {
         mTextView = (TextView) v.findViewById(R.id.textid);
 
         return v;
+    }
+
+    @SuppressLint("LongLogTag")
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.main_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.item_main_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @SuppressLint("LongLogTag")
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "Query Text Submit: " + query);
+                mTextView.setText("onQueryTextSubmit(): "+query);
+                return false;
+            }
+
+            @SuppressLint("LongLogTag")
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Log.d(TAG, "Query Text change: " + newText);
+                mTextView.setText("onQueryTextChange(): " + newText);
+                return false;
+            }
+        });
+
+        searchView.setOnSearchClickListener(v -> {
+            Log.d(TAG, "setOnSearchClickListener()");
+//            searchView.setQuery(query, false);
+        });
     }
 
     private void testREST(){
