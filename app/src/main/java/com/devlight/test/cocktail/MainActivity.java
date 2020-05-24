@@ -2,12 +2,18 @@ package com.devlight.test.cocktail;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.TextView;
 
 import com.devlight.test.cocktail.bean.model.Cocktail;
@@ -17,7 +23,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private TextView mTextView;
 
@@ -28,21 +34,57 @@ public class MainActivity extends AppCompatActivity {
 
         mTextView = findViewById(R.id.textid);
 
+        handleIntent(getIntent());
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
             //TODO TEST
-            testREST();
+            testREST("margarita");
         });
 
 
 
     }
 
-    private void testREST(){
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName())
+        );
+
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setOnQueryTextListener(this);
+
+        return true;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent){
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())){
+            String query = intent.getStringExtra(SearchManager.QUERY);
+
+            testREST(query);
+        }
+    }
+
+    private void testREST(String strSearch){
 
         NetworkService.getInstance()
                 .getJSONApi()
-                .getCocktails("margarita")
+                .getCocktails(strSearch)
                 .enqueue(new Callback<Drinks>() {
                     @Override
                     public void onResponse(@NonNull Call<Drinks> call, @NonNull Response<Drinks> response) {
@@ -76,4 +118,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+
+
+        return true;
+    }
 }
