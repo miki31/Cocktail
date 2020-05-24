@@ -8,6 +8,9 @@ import retrofit2.Response;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.devlight.test.cocktail.bean.model.Cocktail;
@@ -36,6 +39,28 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.search:
+                mTextView.setText("search");
+                return true;
+            case R.id.search1:
+                mTextView.setText("search1");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void testREST(){
