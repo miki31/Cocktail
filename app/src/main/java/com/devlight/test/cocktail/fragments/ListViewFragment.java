@@ -27,6 +27,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import retrofit2.Call;
@@ -181,7 +183,8 @@ public class ListViewFragment extends Fragment {
     }
 
 
-    private class ImagePhotoHolder extends RecyclerView.ViewHolder {
+    private class ImagePhotoHolder extends RecyclerView.ViewHolder
+    implements View.OnClickListener{
         private Cocktail mCocktail;
 
         private ImageView mImgItemCocktail;
@@ -195,6 +198,8 @@ public class ListViewFragment extends Fragment {
             super(inflater.inflate(R.layout.list_item_cocktail,
                     parent, false));
 
+            itemView.setOnClickListener(this);
+
             mImgItemCocktail = (ImageView) itemView.findViewById(R.id.img_item_cocktail);
             mTvNameItemCocktail = (TextView) itemView.findViewById(R.id.tv_name_item_cocktail);
         }
@@ -207,6 +212,22 @@ public class ListViewFragment extends Fragment {
                     .into(mImgItemCocktail);
 
             mTvNameItemCocktail.setText(cocktail.getStrDrink());
+        }
+
+        @Override
+        public void onClick(View v) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+            DetailsFragmentCocktail detailsFragmentCocktail =
+                    DetailsFragmentCocktail.newInstance(mCocktail);
+
+//            Bundle args = new Bundle();
+
+            fragmentTransaction.replace(R.id.fragment_container, detailsFragmentCocktail);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+
         }
     }
 

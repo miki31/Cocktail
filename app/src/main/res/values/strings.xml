@@ -3,4 +3,6 @@
 
     <string name="search_title">Search</string>
     <string name="search_clean_title">Search clean</string>
+
+    <string name="details_name">Name:</string>
 </resources>
